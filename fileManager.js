@@ -5,6 +5,7 @@ import { cat, add, rn, cp, mv, rm } from "./utils/fs.mjs";
 import osHandler from "./utils/os.mjs";
 import hash from "./utils/hash.mjs";
 import { compress, decompress } from "./utils/zip.mjs";
+import { up, cd } from "./utils/nav.mjs";
 
 const userName =
   process.argv
@@ -40,30 +41,9 @@ process.stdin.on("data", (data) => {
     return;
   }
   if (input === "up") {
-    if (currentPath !== root) {
-      currentPath = path.parse(currentPath).dir;
-    }
+    up(currentPath, showInvalidInputMessage);
   } else if (input.startsWith("cd ")) {
-    const inputPath = input.split(" ")?.[1];
-    if (!inputPath) {
-      showInvalidInputMessage();
-      return;
-    } else if (path.parse(inputPath).root === root) {
-      if (fs.existsSync(inputPath) && fs.lstatSync(inputPath).isDirectory()) {
-        currentPath = inputPath;
-      } else {
-        showInvalidInputMessage();
-      }
-    } else {
-      if (
-        fs.existsSync(path.join(currentPath, inputPath)) &&
-        fs.lstatSync(path.resolve(currentPath, inputPath)).isDirectory()
-      ) {
-        currentPath = path.join(currentPath, inputPath);
-      } else {
-        showInvalidInputMessage();
-      }
-    }
+    currentPath = cd(input, currentPath, showInvalidInputMessage);
   } else if (input === "ls") {
     const foldersTableList = [];
     const filesTableList = [];
