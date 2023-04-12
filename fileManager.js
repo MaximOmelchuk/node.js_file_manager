@@ -1,7 +1,8 @@
 import { homedir } from "os";
 import path from "path";
 import fs from "fs";
-import { cat, add, rn, cp, mv, rm } from "./utils/fs_utils.mjs";
+import { cat, add, rn, cp, mv, rm } from "./utils/fs.mjs";
+import osHandler from "./utils/os.mjs";
 
 const userName =
   process.argv
@@ -89,6 +90,8 @@ process.stdin.on("data", (data) => {
     mv(input, currentPath, showInvalidInputMessage);
   } else if (input.startsWith("rm ")) {
     rm(input, currentPath, showInvalidInputMessage);
+  } else if (input.startsWith("os ")) {
+    osHandler(input, showInvalidInputMessage);
   }
 
   showCurrentPath(currentPath);
