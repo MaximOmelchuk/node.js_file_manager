@@ -1,5 +1,6 @@
 import { homedir } from "os";
 import path from "path";
+import fs from "fs";
 
 const userName =
   process.argv
@@ -44,25 +45,47 @@ process.stdin.on("data", (data) => {
       showInvalidInputMessage();
       return;
     } else if (path.parse(inputPath).root === root) {
-      currentPath = inputPath;
+      if (fs.existsSync(inputPath)) {
+        currentPath = inputPath;
+      } else {
+        showInvalidInputMessage();
+      }
     } else {
-      currentPath = path.join(currentPath, inputPath);
+      if (fs.existsSync(path.join(currentPath, inputPath))) {
+        currentPath = path.join(currentPath, inputPath);
+      } else {
+        showInvalidInputMessage();
+      }
     }
   } else if (input === "ls") {
-    const structDatas = [
-      {
-        handler: "http",
-        endpoint: "http://localhost:3000/path",
-        method: "ALL",
-      },
-      {
-        handler: "event",
-        endpoint: "http://localhost:3000/event",
-        method: "POST",
-      },
-      { handler: "GCS", endpoint: "http://localhost:3000/GCS", method: "POST" },
-    ];
-    console.table(structDatas);
+    const foldersTableList = [];
+    const filesTableList = [];
+    fs.readdir(currentPath, (err, data) => {
+      data.forEach((file) => {
+        const fileDetails = fs.lstatSync(path.resolve(currentPath, file));
+        fileDetails.isDirectory()
+          ? foldersTableList.push({ Name: file, Type: "directory" })
+          : filesTableList.push({ Name: file, Type: "file" });
+      });
+      const sortByName = (a, b) => a.Name > b.Name;
+      console.table([
+        ...foldersTableList.sort(sortByName),
+        ...filesTableList.sort(sortByName),
+      ]);
+    });
+    // const structDatas = [
+    //   {
+    //     handler: "http",
+    //     endpoint: "http://localhost:3000/path",
+    //     method: "ALL",
+    //   },
+    //   {
+    //     handler: "event",
+    //     endpoint: "http://localhost:3000/event",
+    //     method: "POST",
+    //   },
+    //   { handler: "GCS", endpoint: "http://localhost:3000/GCS", method: "POST" },
+    // ];
   }
   showCurrentPath(currentPath);
   //   console.log("data");
