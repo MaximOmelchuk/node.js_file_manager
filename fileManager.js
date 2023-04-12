@@ -1,6 +1,7 @@
 import { homedir } from "os";
 import path from "path";
 import fs from "fs";
+import { cat, add, rn, cp, mv, rm } from "./utils/fs_utils.mjs";
 
 const userName =
   process.argv
@@ -39,19 +40,22 @@ process.stdin.on("data", (data) => {
     if (currentPath !== root) {
       currentPath = path.parse(currentPath).dir;
     }
-  } else if (input.startsWith("cd")) {
+  } else if (input.startsWith("cd ")) {
     const inputPath = input.split(" ")?.[1];
     if (!inputPath) {
       showInvalidInputMessage();
       return;
     } else if (path.parse(inputPath).root === root) {
-      if (fs.existsSync(inputPath)) {
+      if (fs.existsSync(inputPath) && fs.lstatSync(inputPath).isDirectory()) {
         currentPath = inputPath;
       } else {
         showInvalidInputMessage();
       }
     } else {
-      if (fs.existsSync(path.join(currentPath, inputPath))) {
+      if (
+        fs.existsSync(path.join(currentPath, inputPath)) &&
+        fs.lstatSync(path.resolve(currentPath, inputPath)).isDirectory()
+      ) {
         currentPath = path.join(currentPath, inputPath);
       } else {
         showInvalidInputMessage();
@@ -73,23 +77,21 @@ process.stdin.on("data", (data) => {
         ...filesTableList.sort(sortByName),
       ]);
     });
-    // const structDatas = [
-    //   {
-    //     handler: "http",
-    //     endpoint: "http://localhost:3000/path",
-    //     method: "ALL",
-    //   },
-    //   {
-    //     handler: "event",
-    //     endpoint: "http://localhost:3000/event",
-    //     method: "POST",
-    //   },
-    //   { handler: "GCS", endpoint: "http://localhost:3000/GCS", method: "POST" },
-    // ];
+  } else if (input.startsWith("cat ")) {
+    cat(input, currentPath, showInvalidInputMessage);
+  } else if (input.startsWith("add ")) {
+    add(input, currentPath, showInvalidInputMessage);
+  } else if (input.startsWith("rn ")) {
+    rn(input, currentPath, showInvalidInputMessage);
+  } else if (input.startsWith("cp ")) {
+    cp(input, currentPath, showInvalidInputMessage);
+  } else if (input.startsWith("mv ")) {
+    mv(input, currentPath, showInvalidInputMessage);
+  } else if (input.startsWith("rm ")) {
+    rm(input, currentPath, showInvalidInputMessage);
   }
+
   showCurrentPath(currentPath);
-  //   console.log("data");
-  //   process.exit();
 });
 
 process.on("SIGINT", goodbyeHandler);
