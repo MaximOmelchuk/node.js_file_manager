@@ -3,6 +3,7 @@ import path from "path";
 import fs from "fs";
 import { cat, add, rn, cp, mv, rm } from "./utils/fs.mjs";
 import osHandler from "./utils/os.mjs";
+import hash from "./utils/hash.mjs";
 
 const userName =
   process.argv
@@ -92,6 +93,8 @@ process.stdin.on("data", (data) => {
     rm(input, currentPath, showInvalidInputMessage);
   } else if (input.startsWith("os ")) {
     osHandler(input, showInvalidInputMessage);
+  } else if (input.startsWith("hash ")) {
+    hash(input, currentPath, showInvalidInputMessage);
   }
 
   showCurrentPath(currentPath);
