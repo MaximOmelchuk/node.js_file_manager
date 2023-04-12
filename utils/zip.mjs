@@ -2,12 +2,12 @@ import fs from "fs";
 import zlib from "zlib";
 import path from "path";
 
-const compress = (
+const compress = ({
   input,
   currentPath,
   showInvalidInputMessage,
-  showFailMessage
-) => {
+  showFailMessage,
+}) => {
   const oldPath = input.split(" ")[1];
   const newPath = input.split(" ")[2];
   const resolvedOldPath = path.resolve(currentPath, oldPath);
@@ -32,12 +32,12 @@ const compress = (
   }
 };
 
-const decompress = (
+const decompress = ({
   input,
   currentPath,
   showInvalidInputMessage,
-  showFailMessage
-) => {
+  showFailMessage,
+}) => {
   const oldPath = input.split(" ")[1];
   const newPath = input.split(" ")[2];
   const resolvedOldPath = path.resolve(currentPath, oldPath);

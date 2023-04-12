@@ -3,17 +3,17 @@ import fs from "fs";
 
 const root = path.parse(process.cwd()).root;
 
-const up = (currentPath, showInvalidInputMessage) => {
+const up = ({ currentPath, showInvalidInputMessage }) => {
   if (currentPath !== root) {
-    currentPath = path.parse(currentPath).dir;
+    return path.parse(currentPath).dir;
   } else {
     showInvalidInputMessage();
+    return currentPath;
   }
 };
 
-const cd = (input, currentPath, showInvalidInputMessage) => {
+const cd = ({ input, currentPath, showInvalidInputMessage }) => {
   const inputPath = input.split(" ")?.[1];
-  console.log(input.slice(0, 2));
   if (!inputPath || (currentPath === root && inputPath.slice(0, 2) === "..")) {
     showInvalidInputMessage();
   } else if (path.parse(inputPath).root === root) {
@@ -35,4 +35,26 @@ const cd = (input, currentPath, showInvalidInputMessage) => {
   return currentPath;
 };
 
-export { up, cd };
+const ls = ({ currentPath, showFailMessage }) => {
+  const foldersTableList = [];
+  const filesTableList = [];
+  fs.readdir(currentPath, (err, data) => {
+    if (err) {
+      showFailMessage();
+      return;
+    }
+    data.forEach((file) => {
+      const fileDetails = fs.lstatSync(path.resolve(currentPath, file));
+      fileDetails.isDirectory()
+        ? foldersTableList.push({ Name: file, Type: "directory" })
+        : filesTableList.push({ Name: file, Type: "file" });
+    });
+    const sortByName = (a, b) => a.Name > b.Name;
+    console.table([
+      ...foldersTableList.sort(sortByName),
+      ...filesTableList.sort(sortByName),
+    ]);
+  });
+};
+
+export { up, cd, ls };

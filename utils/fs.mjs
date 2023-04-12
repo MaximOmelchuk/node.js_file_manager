@@ -6,11 +6,11 @@ import { pipeline } from "stream";
 //   process.stdout.write(`Operation failed\n`);
 // };
 
-const errHandler = (err) => {
-  if (err) throw new Error(err);
-};
+// const errHandler = (err) => {
+//   if (err) throw new Error(err);
+// };
 
-const cat = (input, currentPath, showInvalidInputMessage) => {
+const cat = (input, currentPath, showInvalidInputMessage, showFailMessage) => {
   const inputPath = input.split(" ")[1];
   const resolvedPath = path.resolve(currentPath, inputPath);
   if (fs.existsSync(resolvedPath)) {
@@ -18,22 +18,25 @@ const cat = (input, currentPath, showInvalidInputMessage) => {
     readStream.on("data", (chunk) => {
       process.stdout.write(`${chunk.toString()}\n`);
     });
+    readStream.on("error", showFailMessage);
   } else {
     showInvalidInputMessage();
   }
 };
 
-const add = (input, currentPath, showInvalidInputMessage) => {
+const add = (input, currentPath, showInvalidInputMessage, showFailMessage) => {
   const inputPath = input.split(" ")[1];
   const resolvedPath = path.resolve(currentPath, inputPath);
   if (fs.existsSync(resolvedPath)) {
     showInvalidInputMessage();
   } else {
-    fs.writeFile(resolvedPath, "", errHandler);
+    fs.writeFile(resolvedPath, "", (err) => {
+      if (err) showFailMessage();
+    });
   }
 };
 
-const rn = (input, currentPath, showInvalidInputMessage) => {
+const rn = (input, currentPath, showInvalidInputMessage, showFailMessage) => {
   const oldPath = input.split(" ")[1];
   const newFileName = input.split(" ")[2];
   const resolvedPath = path.resolve(currentPath, oldPath);
@@ -44,12 +47,19 @@ const rn = (input, currentPath, showInvalidInputMessage) => {
     fs.rename(
       resolvedPath,
       path.resolve(path.parse(resolvedPath).dir, newFileName),
-      errHandler
+      (err) => {
+        if (err) showFailMessage();
+      }
     );
   }
 };
 
-const cp = async (input, currentPath, showInvalidInputMessage) => {
+const cp = async ({
+  input,
+  currentPath,
+  showInvalidInputMessage,
+  showFailMessage,
+}) => {
   const oldPath = input.split(" ")[1];
   const newPath = input.split(" ")[2];
   const resolvedOldPath = path.resolve(currentPath, oldPath);
@@ -71,27 +81,37 @@ const cp = async (input, currentPath, showInvalidInputMessage) => {
       fs.createReadStream(resolvedOldPath),
       fs.createWriteStream(resolvedFullNewPath),
       (err) => {
-        if (err) throw new Error(err);
+        if (err) showFailMessage();
       }
     );
   }
 };
 
-const rm = (input, currentPath, showInvalidInputMessage) => {
+const rm = ({
+  input,
+  currentPath,
+  showInvalidInputMessage,
+  showFailMessage,
+}) => {
   const inputPath = input.split(" ")[1];
   const resolvedInputPath = path.resolve(currentPath, inputPath);
   if (fs.existsSync(resolvedInputPath)) {
     fs.unlink(resolvedInputPath, (err) => {
-      if (err) throw new Error(err);
+      if (err) showFailMessage();
     });
   } else {
     showInvalidInputMessage();
   }
 };
 
-const mv = async (input, currentPath, showInvalidInputMessage) => {
-  await cp(input, currentPath, showInvalidInputMessage);
-  rm(input, currentPath, showInvalidInputMessage);
+const mv = async ({
+  input,
+  currentPath,
+  showInvalidInputMessage,
+  showFailMessage,
+}) => {
+  await cp({ input, currentPath, showInvalidInputMessage, showFailMessage });
+  rm({ input, currentPath, showInvalidInputMessage, showFailMessage });
 };
 
 export { cat, add, rn, cp, mv, rm };

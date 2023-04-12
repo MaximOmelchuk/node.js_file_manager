@@ -5,7 +5,7 @@ import { cat, add, rn, cp, mv, rm } from "./utils/fs.mjs";
 import osHandler from "./utils/os.mjs";
 import hash from "./utils/hash.mjs";
 import { compress, decompress } from "./utils/zip.mjs";
-import { up, cd } from "./utils/nav.mjs";
+import { up, cd, ls } from "./utils/nav.mjs";
 
 const userName =
   process.argv
@@ -18,21 +18,26 @@ const goodbyeMessage = `Thank you for using File Manager, ${userName}, goodbye!\
 const invalidInputMessage = `Invalid input\n`;
 const failMessage = `Operation failed\n`;
 
+const colorize = (color, output) => {
+  return ["\x1b[", color, "m", output].join("");
+};
+
 const goodbyeHandler = () => {
-  process.stdout.write(goodbyeMessage);
+  console.log(colorize("36", goodbyeMessage));
   process.exit();
 };
 const showCurrentPath = (path) => {
-  process.stdout.write(`You are currently in ${path}\n`);
+  console.log(colorize("33", `You are currently in ${path}\n`));
 };
 const showInvalidInputMessage = () => {
-  process.stdout.write(invalidInputMessage);
+  console.log(colorize("31", invalidInputMessage));
 };
 const showFailMessage = () => {
-  process.stdout.write(failMessage);
+  console.log(colorize("31", failMessage));
 };
-process.stdout.write(helloMessage);
+console.log(colorize("32", helloMessage));
 showCurrentPath(currentPath);
+console.log("\x1b[31m%s\x1b[0m", "I am red");
 
 process.stdin.on("data", (data) => {
   const input = data.toString().slice(0, -2);
@@ -40,46 +45,33 @@ process.stdin.on("data", (data) => {
     goodbyeHandler();
     return;
   }
+  const args = { input, currentPath, showInvalidInputMessage, showFailMessage };
   if (input === "up") {
-    up(currentPath, showInvalidInputMessage);
+    currentPath = up(args);
   } else if (input.startsWith("cd ")) {
-    currentPath = cd(input, currentPath, showInvalidInputMessage);
+    currentPath = cd(args);
   } else if (input === "ls") {
-    const foldersTableList = [];
-    const filesTableList = [];
-    fs.readdir(currentPath, (err, data) => {
-      data.forEach((file) => {
-        const fileDetails = fs.lstatSync(path.resolve(currentPath, file));
-        fileDetails.isDirectory()
-          ? foldersTableList.push({ Name: file, Type: "directory" })
-          : filesTableList.push({ Name: file, Type: "file" });
-      });
-      const sortByName = (a, b) => a.Name > b.Name;
-      console.table([
-        ...foldersTableList.sort(sortByName),
-        ...filesTableList.sort(sortByName),
-      ]);
-    });
+    ls(args);
   } else if (input.startsWith("cat ")) {
-    cat(input, currentPath, showInvalidInputMessage);
+    cat(args);
   } else if (input.startsWith("add ")) {
-    add(input, currentPath, showInvalidInputMessage);
+    add(args);
   } else if (input.startsWith("rn ")) {
-    rn(input, currentPath, showInvalidInputMessage);
+    rn(args);
   } else if (input.startsWith("cp ")) {
-    cp(input, currentPath, showInvalidInputMessage);
+    cp(args);
   } else if (input.startsWith("mv ")) {
-    mv(input, currentPath, showInvalidInputMessage);
+    mv(args);
   } else if (input.startsWith("rm ")) {
-    rm(input, currentPath, showInvalidInputMessage);
+    rm(args);
   } else if (input.startsWith("os ")) {
-    osHandler(input, showInvalidInputMessage);
+    osHandler(args);
   } else if (input.startsWith("hash ")) {
-    hash(input, currentPath, showInvalidInputMessage, showFailMessage);
+    hash(args);
   } else if (input.startsWith("compress ")) {
-    compress(input, currentPath, showInvalidInputMessage, showFailMessage);
+    compress(args);
   } else if (input.startsWith("decompress ")) {
-    decompress(input, currentPath, showInvalidInputMessage, showFailMessage);
+    decompress(args);
   } else {
     showInvalidInputMessage();
   }
