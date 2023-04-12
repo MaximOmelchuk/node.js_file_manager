@@ -4,6 +4,7 @@ import fs from "fs";
 import { cat, add, rn, cp, mv, rm } from "./utils/fs.mjs";
 import osHandler from "./utils/os.mjs";
 import hash from "./utils/hash.mjs";
+import { compress, decompress } from "./utils/zip.mjs";
 
 const userName =
   process.argv
@@ -94,7 +95,13 @@ process.stdin.on("data", (data) => {
   } else if (input.startsWith("os ")) {
     osHandler(input, showInvalidInputMessage);
   } else if (input.startsWith("hash ")) {
-    hash(input, currentPath, showInvalidInputMessage);
+    hash(input, currentPath, showInvalidInputMessage, showFailMessage);
+  } else if (input.startsWith("compress ")) {
+    compress(input, currentPath, showInvalidInputMessage, showFailMessage);
+  } else if (input.startsWith("decompress ")) {
+    decompress(input, currentPath, showInvalidInputMessage, showFailMessage);
+  } else {
+    showInvalidInputMessage();
   }
 
   showCurrentPath(currentPath);
