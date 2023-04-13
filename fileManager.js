@@ -14,30 +14,29 @@ const userName =
 const root = path.parse(process.cwd()).root;
 let currentPath = homedir();
 const helloMessage = `Welcome to the File Manager, ${userName}!\n`;
-const goodbyeMessage = `Thank you for using File Manager, ${userName}, goodbye!\n`;
-const invalidInputMessage = `Invalid input\n`;
-const failMessage = `Operation failed\n`;
+const goodbyeMessage = `\nThank you for using File Manager, ${userName}, goodbye!\n`;
+const invalidInputMessage = `Invalid input`;
+const failMessage = `Operation failed`;
 
 const colorize = (color, output) => {
-  return ["\x1b[", color, "m", output].join("");
+  return [`\x1b[${color}m%s\x1b[0m`, output];
 };
 
 const goodbyeHandler = () => {
-  console.log(colorize("36", goodbyeMessage));
+  console.log(...colorize("36", goodbyeMessage));
   process.exit();
 };
 const showCurrentPath = (path) => {
-  console.log(colorize("33", `You are currently in ${path}\n`));
+  console.log(...colorize("33", `You are currently in ${path}`));
 };
 const showInvalidInputMessage = () => {
-  console.log(colorize("31", invalidInputMessage));
+  console.log(...colorize("31", invalidInputMessage));
 };
 const showFailMessage = () => {
-  console.log(colorize("31", failMessage));
+  console.log(...colorize("31", failMessage));
 };
-console.log(colorize("32", helloMessage));
+console.log(...colorize("32", helloMessage));
 showCurrentPath(currentPath);
-console.log("\x1b[31m%s\x1b[0m", "I am red");
 
 process.stdin.on("data", (data) => {
   const input = data.toString().slice(0, -2);
