@@ -1,0 +1,20 @@
+{
+  "name": "file_manager",
+  "version": "1.0.0",
+  "description": "RSSchool",
+  "main": "fileManager.js",
+  "type": "module",
+  "scripts": {
+    "start": "node fileManager"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MaximOmelchuk/node.js_file_manager.git"
+  },
+  "author": "Amialchuk Maksim",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MaximOmelchuk/node.js_file_manager/issues"
+  },
+  "homepage": "https://github.com/MaximOmelchuk/node.js_file_manager#readme"
+}

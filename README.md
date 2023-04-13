@@ -1,1 +1,3 @@
-# node.js_file_manager
+RSSchool
+file manager
+Amialchuk Maksim
