@@ -15,15 +15,16 @@ const compress = ({
   const fileName = path.parse(resolvedOldPath).base;
   const resolvedFullNewPath = path.resolve(resolvedNewPath, fileName);
 
-  if (
-    !oldPath ||
-    !newPath ||
-    !fs.existsSync(resolvedOldPath) ||
-    fs.existsSync(resolvedFullNewPath) ||
-    !fs.lstatSync(resolvedNewPath).isDirectory()
-  ) {
+  if (!oldPath || !newPath) {
     showInvalidInputMessage();
     return;
+  } else if (
+    !fs.existsSync(resolvedOldPath) ||
+    fs.existsSync(resolvedFullNewPath) ||
+    (fs.existsSync(resolvedNewPath) &&
+      !fs.lstatSync(resolvedNewPath).isDirectory())
+  ) {
+    showFailMessage();
   } else {
     fs.createReadStream(resolvedOldPath)
       .pipe(zlib.createBrotliCompress())
@@ -45,15 +46,16 @@ const decompress = ({
   const fileName = path.parse(resolvedOldPath).base;
   const resolvedFullNewPath = path.resolve(resolvedNewPath, fileName);
 
-  if (
-    !oldPath ||
-    !newPath ||
-    !fs.existsSync(resolvedOldPath) ||
-    fs.existsSync(resolvedFullNewPath) ||
-    !fs.lstatSync(resolvedNewPath).isDirectory()
-  ) {
+  if (!oldPath || !newPath) {
     showInvalidInputMessage();
     return;
+  } else if (
+    !fs.existsSync(resolvedOldPath) ||
+    fs.existsSync(resolvedFullNewPath) ||
+    (fs.existsSync(resolvedNewPath) &&
+      !fs.lstatSync(resolvedNewPath).isDirectory())
+  ) {
+    showFailMessage();
   } else {
     fs.createReadStream(resolvedOldPath)
       .pipe(zlib.createBrotliDecompress())

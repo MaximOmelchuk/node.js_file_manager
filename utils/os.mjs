@@ -26,6 +26,8 @@ const osHandler = ({ input, showInvalidInputMessage, showFailMessage }) => {
       write(os.userInfo().username);
     } else if (flag === "architecture") {
       write(os.arch());
+    } else {
+      showInvalidInputMessage();
     }
   } catch (err) {
     showFailMessage();

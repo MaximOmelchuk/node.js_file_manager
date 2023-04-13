@@ -6,11 +6,18 @@ const write = (text) => {
   process.stdout.write(`${text}\n`);
 };
 
-const hash = ({input, currentPath, showInvalidInputMessage, showFailMessage}) => {
+const hash = ({
+  input,
+  currentPath,
+  showInvalidInputMessage,
+  showFailMessage,
+}) => {
   const inputPath = input.split(" ")[1];
   const resolvedInputPath = path.resolve(currentPath, inputPath);
-  if (!fs.existsSync(resolvedInputPath)) {
+  if (!inputPath) {
     showInvalidInputMessage();
+  } else if (!fs.existsSync(resolvedInputPath)) {
+    showFailMessage();
   } else {
     fs.readFile(resolvedInputPath, (err, data) => {
       if (err) showFailMessage();

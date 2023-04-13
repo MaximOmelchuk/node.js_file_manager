@@ -3,16 +3,21 @@ import fs from "fs";
 
 const root = path.parse(process.cwd()).root;
 
-const up = ({ currentPath, showInvalidInputMessage }) => {
+const up = ({ currentPath, showFailMessage }) => {
   if (currentPath !== root) {
     return path.parse(currentPath).dir;
   } else {
-    showInvalidInputMessage();
+    showFailMessage();
     return currentPath;
   }
 };
 
-const cd = ({ input, currentPath, showInvalidInputMessage }) => {
+const cd = ({
+  input,
+  currentPath,
+  showInvalidInputMessage,
+  showFailMessage,
+}) => {
   const inputPath = input.split(" ")?.[1];
   if (!inputPath || (currentPath === root && inputPath.slice(0, 2) === "..")) {
     showInvalidInputMessage();
@@ -20,7 +25,7 @@ const cd = ({ input, currentPath, showInvalidInputMessage }) => {
     if (fs.existsSync(inputPath) && fs.lstatSync(inputPath).isDirectory()) {
       return inputPath;
     } else {
-      showInvalidInputMessage();
+      showFailMessage();
     }
   } else {
     if (
@@ -29,7 +34,7 @@ const cd = ({ input, currentPath, showInvalidInputMessage }) => {
     ) {
       return path.join(currentPath, inputPath);
     } else {
-      showInvalidInputMessage();
+      showFailMessage();
     }
   }
   return currentPath;
